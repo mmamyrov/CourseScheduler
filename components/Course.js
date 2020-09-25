@@ -7,6 +7,7 @@ const Course = ({course, isDisabled, isSelected, select}) => (
   <TouchableOpacity style={styles[isSelected ? 'courseButtonSelected' : isDisabled ? 
     'courseButtonDisabled' : 'courseButton']}
     onPress={() => select(course)}
+    disabled={isDisabled}
   >
     <Text style={styles.courseText}>
       {`CS ${getCourseNumber(course)}\n${course.meets}`}
