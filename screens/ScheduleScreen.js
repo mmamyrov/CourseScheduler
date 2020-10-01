@@ -1,9 +1,15 @@
 import React, { useContext, useState, useEffect } from "react";
 import { StyleSheet, Text, SafeAreaView } from "react-native";
+import { firebase } from "../firebase.js";
 import Course from "../components/Course";
 import CourseList from "../components/CourseList";
 import UserContext from "../UserContext";
 import CourseEditScreen from "./CourseEditScreen";
+
+const fixCourses = json => ({
+  ...json,
+  courses: Object.values(json.courses)
+});
 
 const ScheduleScreen = ({ navigation }) => {
   const user = useContext(UserContext);
@@ -14,16 +20,11 @@ const ScheduleScreen = ({ navigation }) => {
     navigation.navigate(canEdit ? "CourseEditScreen" : "CourseDetailScreen", { course });
   };
 
-  const url = "https://courses.cs.northwestern.edu/394/data/cs-courses.php";
-
   useEffect(() => {
-    const fetchSchedule = async () => {
-      const response = await fetch(url);
-      if (!response.ok) throw response;
-      const json = await response.json();
-      setSchedule(json);
-    };
-    fetchSchedule();
+    const db = firebase.database().ref();
+    db.on('value', snap => {
+      if (snap.val()) setSchedule(fixCourses(snap.val()));
+    }, error => console.log(error));
   }, []);
 
   return (
